@@ -34,5 +34,11 @@ for summary in ${outdir}/*.summary
 do
   sample=${summary##*/}
   sample=${sample%%.*}
-  head -n 1 ${summary} | sed "s/^/${sample}/" >> ${dir}/FungalBLAST.data
+  head -n 1 ${summary} | sed -r 's/^( *[^ ]+) +/\1\t/' | \
+    sed "s/^/${sample}/" >> ${dir}/FungalBLAST.data
 done
+
+# Associate the top-matching genomes for each strain
+# with the strain metadata.
+paste -d'\t' ${dir}/FungalBLAST.data <(tail -n +2 data/BB/metadata-raw.tsv ) \
+  | cut -f1,2,7 > ${dir}/StrainSummary.data
