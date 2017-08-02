@@ -20,10 +20,14 @@ Reference sequences for various members of Saccharyomyces sensu stricto. In Marc
 
 Reference sequences for various Candida species. In March 2017, I downloaded the most recent genomes from the Candida database: http://www.candidagenome.org/download/sequence/ I renamed species to take Gspecies form.
 
+**Bacteria**
+
+Reference sequences for various bacterial species of interest. NCBI reference numbers are included where appropriate.
+
 **other**
 
 *Klactis:* In April 2017, I downloaded the Kluyveromyces lactis genome available here: ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/002/515/GCF_000002515.2_ASM251v1/GCF_000002515.2_ASM251v1_genomic.fna.gz
 
 **scripts**
 
-*setup.sh*
+*setup.sh* This script 

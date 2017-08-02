@@ -8,7 +8,7 @@ samplesheet="pipelines/BB/Samples.data"
 # Run script for all samples.
 while read rawdir index1 index2 sample run
 do
-  qsub -cwd -pe serial 4 \
+  qsub -cwd -l m_mem_free=8G \
   -N ${sample} -o nobackup/BB/sge/${sample}.o -e nobackup/BB/sge/${sample}.e \
   ${pipeline} ${rawdir} ${index1} ${index2} ${sample} ${run}
 done < ${samplesheet} 
