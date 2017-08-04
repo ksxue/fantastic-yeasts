@@ -42,3 +42,6 @@ done
 # with the strain metadata.
 paste -d'\t' ${dir}/FungalBLAST.data <(tail -n +2 data/BB/metadata-raw.tsv ) \
   | cut -f1,2,7 > ${dir}/StrainSummary.data
+  
+# Create a list of all strains whose primary match is S. cerevisiae.
+grep saccer ${dir}/StrainSummary.data | cut -f1 -d' ' > data/BB/Scer.data
