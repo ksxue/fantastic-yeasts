@@ -38,7 +38,6 @@ fi
 if [ ! -f ${dir}/${sample}.bam ];
 then
   bowtie2 --very-sensitive-local --un-conc-gz ${dir}/${sample}-unmapped \
-	-p 4 \
 	-X 1000 \
 	-x ${reference} \
 	-1 ${dir}/${sample}_trimmed-R1.fastq.gz \
