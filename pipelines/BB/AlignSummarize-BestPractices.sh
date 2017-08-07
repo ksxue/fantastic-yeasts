@@ -31,7 +31,7 @@ dir="nobackup/BB"
 modules="pipelines/BB/LoadModules.sh"
 reference="reference/S288C/S288CReferenceAnnotated"
 picarddir="/net/gs/vol3/software/modules-sw/picard/1.43/Linux/all/all/"
-clean=1 # If 0, reruns entire pipeline and regenerates all intermediates.
+clean=0 # If 0, reruns entire pipeline and regenerates all intermediates.
 
 # Note that this pipeline requires that the reference has already been indexed by
 # both bowtie, samtools, and GATK.
@@ -79,7 +79,7 @@ fi
 
 # Remove sequencing duplicates using Picard.
 echo "Remove sequencing duplicates."
-if [ ! -f ${dir}/${sample}-readgroups.bam ] || [ ${clean} -eq "0" ];
+if [ ! -f ${dir}/${sample}.bam ] || [ ${clean} -eq "0" ];
 then
   # Remove sequencing duplicates.
   java -Xmx2g -jar ${picarddir}/MarkDuplicates.jar \
@@ -90,9 +90,11 @@ then
   # Add read groups.
   java -Xmx2g -jar ${picarddir}/AddOrReplaceReadGroups.jar \
     INPUT=${dir}/${sample}-rmdup.bam \
-	OUTPUT=${dir}/${sample}-readgroups.bam \
-	RGID=${sample} RGLB=1 RGPU=1 RGPL=illumina RGSM=yeast \
+	OUTPUT=${dir}/${sample}.bam \
+	RGID=${sample} RGLB=1 RGPU=1 RGPL=illumina RGSM=${sample} \
 	VALIDATION_STRINGENCY=LENIENT
+  # Remove intermediate files.
+  rm -f ${dir}/${sample}-rmdup.bam
 fi
 
 # Generate genomic GVCF files for each sample using HaplotypeCaller.
@@ -103,12 +105,15 @@ echo "Perform raw variant calling."
 if [ ! -f ${dir}/${sample}-raw.g.vcf ] || [ $clean -eq "0" ];
 then
   # Prepare BAM files for analysis.
-  samtools index ${dir}/${sample}-readgroups.bam
+  samtools index ${dir}/${sample}.bam
+  # Convert BAM file to raw gVCF format using samtools for ploidy analysis.
+  samtools mpileup -q 20 -Q 20 -v -f ${reference}.fasta \
+    -o ${dir}/${sample}.vcf ${dir}/${sample}.bam
   # Call variants using HaplotypeCaller.
   java -jar ${GATK_DIR}/GenomeAnalysisTK.jar \
     -T HaplotypeCaller \
     -R ${reference}.fasta \
-    -I ${dir}/${sample}-readgroups.bam \
+    -I ${dir}/${sample}.bam \
     --genotyping_mode DISCOVERY \
 	--emitRefConfidence GVCF \
     -o ${dir}/${sample}-raw.g.vcf 

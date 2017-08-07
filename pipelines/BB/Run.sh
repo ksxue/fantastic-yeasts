@@ -3,7 +3,7 @@
 
 # Location of pipeline script.
 pipeline="pipelines/BB/AlignSummarize-BestPractices.sh"
-samplesheet="pipelines/BB/Samples.test"
+samplesheet="pipelines/BB/Samples.data"
 
 # Run script for all samples.
 while read rawdir index1 index2 sample run
