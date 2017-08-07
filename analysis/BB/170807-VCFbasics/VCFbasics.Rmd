@@ -1,0 +1,32 @@
+---
+title: "Check allele frequencies"
+output: html_document
+---
+
+```{r global variables, warning=FALSE, message=FALSE, echo=FALSE}
+knitr::opts_chunk$set(warning=FALSE, message=FALSE)
+
+# Demo the package VariantAnnotation for analyzing yeast variants.
+
+# installation
+# source("https://bioconductor.org/biocLite.R")
+# biocLite("VariantAnnotation")
+# biocLite("BSgenome.Scerevisiae.UCSC.sacCer1")
+# biocLite('snpStats')
+# http://bioconductor.org/packages/release/bioc/vignettes/VariantAnnotation/inst/doc/VariantAnnotation.pdf
+
+library(VariantAnnotation)
+
+# Read in the VCF. Make sure the reference genome has been installed.
+vcf <- readVcf("../../../nobackup/BB/Scer-snps-filtered.vcf", "sacCer1")
+
+# List the samples.
+samples(header(vcf))
+
+# Extract the genotypes as a matrix.
+GT <- geno(vcf)$GT
+
+# Convert the genotypes to a SnpMatrix object for use wtih snpStats and other packages.
+snpmatrix <- genotypeToSnpMatrix(vcf)
+```
+
