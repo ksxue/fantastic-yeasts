@@ -1,5 +1,5 @@
 ---
-title: "Check allele frequencies"
+title: "Perform basic operations with VCF files."
 output: html_document
 ---
 
@@ -16,6 +16,7 @@ knitr::opts_chunk$set(warning=FALSE, message=FALSE)
 # http://bioconductor.org/packages/release/bioc/vignettes/VariantAnnotation/inst/doc/VariantAnnotation.pdf
 
 library(VariantAnnotation)
+library(snpStats)
 
 # Read in the VCF. Make sure the reference genome has been installed.
 vcf <- readVcf("../../../nobackup/BB/Scer-snps-filtered.vcf", "sacCer1")
@@ -28,5 +29,73 @@ GT <- geno(vcf)$GT
 
 # Convert the genotypes to a SnpMatrix object for use wtih snpStats and other packages.
 snpmatrix <- genotypeToSnpMatrix(vcf)
+```
+
+```{r}
+library(dplyr)
+library(tidyr)
+library(stringr)
+library(ggplot2)
+library(cowplot)
+
+# Convert genotype matrix to a dataframe for manipulation with dplyr.
+Data <- as.data.frame(GT)
+Data$SNP <- row.names(GT)
+
+# Convert data to tidy format.
+Data <- Data %>% gather(Sample, Genotype, FY0002:FY0028)
+
+# Parse SNP annotation.
+Data <- Data %>% 
+  separate(SNP, into=c("Genome","Chr","Pos","Ref","Alt"), sep=":|_|/", remove=FALSE) %>%
+  mutate(Chr=paste(Genome,Chr,sep="_")) %>%
+  select(-Genome)
+Data <- Data %>%
+  mutate(Genotype=ifelse(Genotype==".","./.",Genotype)) %>%
+  separate(Genotype, into=c("A1","A2"), sep="/", remove=FALSE)
+Data$Pos <- as.integer(Data$Pos)
+Data <- Data %>% arrange(Chr, Pos)
+Data$A1 <- as.integer(Data$A1)
+Data$A2 <- as.integer(Data$A2)
+
+# Calculate distance from reference at each site for each sample.
+# This value should be 0, 1, or 2.
+# All alternate alleles count the same.
+Data <- Data %>%
+  mutate(Distance=ifelse(A1>1,1,A1)+ifelse(A2>1,1,A2))
+
+# Calculate the allele frequency at each variant.
+AlleleFreq <- Data %>%
+  filter(!is.na(Distance)) %>%
+  group_by(SNP, Chr, Pos, Ref, Alt) %>%
+  summarize(Freq=sum(Distance)/(2*sum(n()))) %>%
+  arrange(Chr, Pos)
+
+# Plot site frequency spectrum.
+ggplot(AlleleFreq) +
+  geom_bar(aes(x=Freq), stat="bin")
+
+# Calculate the distance of each variant from the reference sequence.
+# Double-count alleles that are homozygous alternate.
+StrainDistance <- Data %>%
+  filter(!is.na(Distance)) %>%
+  group_by(Sample) %>% summarize(Distance=sum(Distance)) %>%
+  arrange(desc(Distance))
+StrainDistance$Sample <- factor(StrainDistance$Sample, 
+                                levels=StrainDistance$Sample)
+
+# Plot each strain's distance from the reference sequence.
+ggplot(StrainDistance) +
+  geom_bar(aes(x=Sample, y=Distance), stat="identity") +
+  theme(axis.text.x=element_text(angle=90, vjust=0.5))
+
+# For the potential hybrid FY0002, calculate the distance from the reference
+# in 10kB windows along the genome.
+ggplot(Data %>% filter(Sample=="FY0002", !is.na(Distance)) %>%
+         mutate(Pos=floor(Pos/10000)*10000) %>%
+         group_by(Chr, Pos) %>% summarize(Distance=sum(Distance))) +
+  geom_point(aes(x=Pos, y=Distance)) + 
+  geom_line(aes(x=Pos, y=Distance)) +
+  facet_wrap(~Chr)
 ```
 
