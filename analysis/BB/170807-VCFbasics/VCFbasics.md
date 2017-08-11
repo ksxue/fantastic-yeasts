@@ -1,37 +1,11 @@
----
-title: "Perform basic operations with VCF files."
-output: github_document
----
+Perform basic operations with VCF files.
+================
 
-```{r global variables, warning=FALSE, message=FALSE, echo=FALSE}
-knitr::opts_chunk$set(warning=FALSE, message=FALSE)
+    ##  [1] "FY0002" "FY0003" "FY0004" "FY0007" "FY0008" "FY0009" "FY0011"
+    ##  [8] "FY0014" "FY0015" "FY0018" "FY0019" "FY0020" "FY0021" "FY0022"
+    ## [15] "FY0024" "FY0026" "FY0027" "FY0028"
 
-# Demo the package VariantAnnotation for analyzing yeast variants.
-
-# installation
-# source("https://bioconductor.org/biocLite.R")
-# biocLite("VariantAnnotation")
-# biocLite("BSgenome.Scerevisiae.UCSC.sacCer1")
-# biocLite('snpStats')
-# http://bioconductor.org/packages/release/bioc/vignettes/VariantAnnotation/inst/doc/VariantAnnotation.pdf
-
-library(VariantAnnotation)
-library(snpStats)
-
-# Read in the VCF. Make sure the reference genome has been installed.
-vcf <- readVcf("../../../nobackup/BB/Scer-snps-filtered.vcf", "sacCer1")
-
-# List the samples.
-samples(header(vcf))
-
-# Extract the genotypes as a matrix.
-GT <- geno(vcf)$GT
-
-# Convert the genotypes to a SnpMatrix object for use wtih snpStats and other packages.
-snpmatrix <- genotypeToSnpMatrix(vcf)
-```
-
-```{r}
+``` r
 library(dplyr)
 library(tidyr)
 library(stringr)
@@ -74,7 +48,11 @@ AlleleFreq <- Data %>%
 # Plot site frequency spectrum.
 ggplot(AlleleFreq) +
   geom_histogram(aes(x=Freq), binwidth=0.05)
+```
 
+![](VCFbasics_files/figure-markdown_github-ascii_identifiers/unnamed-chunk-1-1.png)
+
+``` r
 # Calculate the distance of each variant from the reference sequence.
 # Double-count alleles that are homozygous alternate.
 StrainDistance <- Data %>%
@@ -88,7 +66,11 @@ StrainDistance$Sample <- factor(StrainDistance$Sample,
 ggplot(StrainDistance) +
   geom_bar(aes(x=Sample, y=Distance), stat="identity") +
   theme(axis.text.x=element_text(angle=90, vjust=0.5))
+```
 
+![](VCFbasics_files/figure-markdown_github-ascii_identifiers/unnamed-chunk-1-2.png)
+
+``` r
 # For the potential hybrid FY0002, calculate the distance from the reference
 # in 10kB windows along the genome.
 ggplot(Data %>% filter(Sample=="FY0002", !is.na(Distance)) %>%
@@ -99,3 +81,4 @@ ggplot(Data %>% filter(Sample=="FY0002", !is.na(Distance)) %>%
   facet_wrap(~Chr)
 ```
 
+![](VCFbasics_files/figure-markdown_github-ascii_identifiers/unnamed-chunk-1-3.png)
