@@ -11,7 +11,7 @@ module load blast+/2.2.29
 
 # Variables and file paths.
 dir="analysis/BB/170414-BLAST-fungal"
-runBLAST="analysis/BB/170414-BLAST-fungal/runBLAST.sh"
+runBLAST="analysis/BB/170414-BLAST-fungal/RunBLAST.sh"
 genomes="analysis/BB/170414-BLAST-fungal/dirs_asco.txt"
 outdir="nobackup/BB/170414-BLAST-fungal"
 
