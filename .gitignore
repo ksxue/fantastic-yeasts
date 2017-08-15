@@ -29,9 +29,9 @@ Ignore everything except things listed explicitly below
 !**/*_files/**
 
 # Don't ignore FASTA files, which may correspond to sequence references.
-!*.fasta
-!*.fa
-!*.bed
+#!*.fasta
+#!*.fa
+#!*.bed
 
 # Don't ignore PDB files.
 !*.pdb
