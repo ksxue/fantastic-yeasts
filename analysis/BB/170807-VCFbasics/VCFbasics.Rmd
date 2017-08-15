@@ -63,7 +63,10 @@ Data$A2 <- as.integer(Data$A2)
 # All alternate alleles count the same.
 Data <- Data %>%
   mutate(Distance=ifelse(A1>1,1,A1)+ifelse(A2>1,1,A2))
+```
 
+
+```{r}
 # Calculate the allele frequency at each variant.
 AlleleFreq <- Data %>%
   filter(!is.na(Distance)) %>%
@@ -97,5 +100,9 @@ ggplot(Data %>% filter(Sample=="FY0002", !is.na(Distance)) %>%
   geom_point(aes(x=Pos, y=Distance)) + 
   geom_line(aes(x=Pos, y=Distance)) +
   facet_wrap(~Chr)
+```
+
+```{r}
+# Calculate the pairwise distance of each strain from every other.
 ```
 

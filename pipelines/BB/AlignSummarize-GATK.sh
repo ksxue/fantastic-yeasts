@@ -1,7 +1,6 @@
 #!/bin/bash
 
-# This script takes raw sequencing reads,
-# trims adapters,
+# This script takes trimmed sequencing reads,
 # aligns them to the specified reference,
 # removes sequencing duplicates,
 # and generates a pileup and gVCF file.
@@ -12,14 +11,15 @@
 module load modules modules-init modules-gs
 module load python/2.7.3
 module load cutadapt/1.8.3
+module laod bowtie2/2.2.3
 module load samtools/1.3
-module load picard/1.43
 module load bcftools/1.3.1
 module load VCFtools/0.1.14
 module load zlib/1.2.6
 module load bwa/0.7.13
 module load java/8u25
 module load GATK/3.7
+module load picard/1.43
 
 # Input parameters.
 rawdir="$1"
@@ -30,7 +30,6 @@ run="$5"
 dir="nobackup/BB"
 modules="pipelines/BB/LoadModules.sh"
 reference="reference/S288C/S288CReferenceAnnotated"
-picarddir="/net/gs/vol3/software/modules-sw/picard/1.43/Linux/all/all/"
 clean=0 # If 0, reruns entire pipeline and regenerates all intermediates.
 
 # Note that this pipeline requires that the reference has already been indexed by
@@ -82,13 +81,13 @@ echo "Remove sequencing duplicates."
 if [ ! -f ${dir}/${sample}.bam ] || [ ${clean} -eq "0" ];
 then
   # Remove sequencing duplicates.
-  java -Xmx2g -jar ${picarddir}/MarkDuplicates.jar \
+  java -Xmx2g -jar ${PICARD_DIR}/MarkDuplicates.jar \
     INPUT=${dir}/${sample}-raw.bam \
 	OUTPUT=${dir}/${sample}-rmdup.bam \
 	METRICS_FILE=${dir}/${sample}.picard \
 	REMOVE_DUPLICATES=TRUE VALIDATION_STRINGENCY=LENIENT ASSUME_SORTED=TRUE
   # Add read groups.
-  java -Xmx2g -jar ${picarddir}/AddOrReplaceReadGroups.jar \
+  java -Xmx2g -jar ${PICARD_DIR}/AddOrReplaceReadGroups.jar \
     INPUT=${dir}/${sample}-rmdup.bam \
 	OUTPUT=${dir}/${sample}.bam \
 	RGID=${sample} RGLB=1 RGPU=1 RGPL=illumina RGSM=${sample} \
