@@ -11,4 +11,4 @@ Jim has listed all of the genomes in his collection, along with their short iden
 
 **BLAST**
 
-For each of the sequenced yeast strains, I am BLAST-ing the first ten thousand reads against all of the Ascomycetes genomes that Jim has in his collection. I could easily expand this to include other groups of fungi as well.
+For each of the sequenced yeast strains, I am BLAST-ing the first thousand reads against all of the Ascomycetes genomes that Jim has in his collection. I could easily expand this to include other groups of fungi as well.

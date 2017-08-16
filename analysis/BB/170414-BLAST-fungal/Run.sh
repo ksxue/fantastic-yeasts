@@ -14,18 +14,17 @@ dir="analysis/BB/170414-BLAST-fungal"
 runBLAST="analysis/BB/170414-BLAST-fungal/RunBLAST.sh"
 genomes="analysis/BB/170414-BLAST-fungal/dirs_asco.txt"
 outdir="nobackup/BB/170414-BLAST-fungal"
+numreads=1000
+samplesheet="data/BB/Samples.data"
 
 # Submit jobs to BLAST 10000 reads from each sample 
 # against Jim Thomas's Ascomycetes genomes.
 :<<END
-:<<END
-for FASTQ in nobackup/BB/*_trimmed-R1.fastq.gz
+while read fastq1 fastq2 trimmed1 trimmed2 sample
 do
-  sample=${FASTQ##*/}
-  sample=${sample%%_*}
   qsub -cwd -N ${sample} -o nobackup/BB/sge/${sample}.o -e nobackup/BB/sge/${sample}.e \
-    ${runBLAST} ${FASTQ} ${genomes} 10000
-done
+    ${runBLAST} ${fastq1} ${genomes} ${numreads} ${sample} ${outdir}
+done < ${samplesheet}
 END
 
 # Extract the top-matching genome for each sample.
