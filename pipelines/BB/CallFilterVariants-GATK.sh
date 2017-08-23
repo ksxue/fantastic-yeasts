@@ -6,89 +6,78 @@
 
 # Load dependencies.
 module load modules modules-init modules-gs
-module load python/2.7.3
-module load cutadapt/1.8.3
-module load samtools/1.3
-module load picard/1.43
 module load bcftools/1.3.1
-module load VCFtools/0.1.14
-module load zlib/1.2.6
-module load bwa/0.7.13
 module load java/8u25
 module load GATK/3.7
 
 # Input parameters.
-rawdir="$1"
-index1="$2"
-index2="$3"
-sample="$4"
-run="$5"
-dir="nobackup/BB"
-modules="pipelines/BB/LoadModules.sh"
-reference="reference/S288C/S288CReferenceAnnotated"
-clean=1 # If 0, reruns entire pipeline and regenerates all intermediates.
+samplelist="$1" # Give list of .g.vcf files to be combined in joint analysis.
+reference="$2" # Give reference path WITHOUT .fasta or .fa extension.
+dir="$3" # Give the desired location of intermediate output files.
+sample="$4" # Give the short nickname for the output files.
+clean="$5" # If 0, reruns entire pipeline and regenerates all intermediates.
 
-# Take the list of S. cerevisiae samples and convert them into
-# an appropriate formatted list of files.
-sed 's/^/nobackup\/BB\//' data/BB/Scer.data | sed 's/$/-raw.gvcf/' \
-  > ${dir}/Scer.list
+# Notifies user when all intermediate files are being regenerated.
+if [ ${clean} -eq "0" ]; then
+  echo "Pipeline will run in its entirety, overwriting all existing intermediates."
+fi
 
 # Perform joint genotype calling on S. cerevisiae samples
 # using GATK.
 echo "Perform raw variant calling."
-if [ ! -f ${dir}/Scer-raw.vcf ] || [ $clean -eq "0" ];
+if [ ! -f ${dir}/${sample}-raw.vcf ] || [ $clean -eq "0" ];
 then
   java -jar ${GATK_DIR}/GenomeAnalysisTK.jar \
     -T GenotypeGVCFs \
     -R ${reference}.fasta \
-    -V ${dir}/Scer.list \
-    -o ${dir}/Scer-raw.vcf
+    -V ${samplelist} \
+    -o ${dir}/${sample}-raw.vcf
 fi
 
 # Apply hard filters to the call set to produce a list of SNPs.
 echo "Apply filters to raw variant calls."
-if [ ! -f ${dir}/Scer-snps-filtered.vcf ] || [ $clean -eq "0" ];
+if [ ! -f ${dir}/${sample}-snps-filtered.vcf ] || [ $clean -eq "0" ];
 then
   # Extract SNPs from call set.
   java -jar ${GATK_DIR}/GenomeAnalysisTK.jar \
     -T SelectVariants \
     -R ${reference}.fasta \
-    -V ${dir}/Scer-raw.vcf \
+    -V ${dir}/${sample}-raw.vcf \
     -selectType SNP \
-    -o ${dir}/Scer-snps-raw.vcf
+    -o ${dir}/${sample}-snps-raw.vcf
 	
   # Apply filters to call sets.
   java -jar ${GATK_DIR}/GenomeAnalysisTK.jar \
     -T VariantFiltration \
     -R ${reference}.fasta \
-    -V ${dir}/Scer-snps-raw.vcf \
+    -V ${dir}/${sample}-snps-raw.vcf \
     --filterExpression \
 	  "QD < 2.0 || FS > 60.0 || MQ < 40.0 || MQRankSum < -12.5 || ReadPosRankSum < -8.0" \
     --filterName "GATK_Best_Practices_default" \
-    -o ${dir}/Scer-snps-tagged.vcf
+    -o ${dir}/${sample}-snps-tagged.vcf
 	
   # Select only variants that have passed the filters.
   java -jar ${GATK_DIR}/GenomeAnalysisTK.jar \
     -T SelectVariants \
 	-R ${reference}.fasta \
-	-V ${dir}/Scer-snps-tagged.vcf \
+	-V ${dir}/${sample}-snps-tagged.vcf \
 	-select 'vc.isNotFiltered()' \
-	-o ${dir}/Scer-snps-filtered.vcf
+	-o ${dir}/${sample}-snps-filtered.vcf
 	
   # Remove intermediate files.
-  rm -f ${dir}/Scer-snps-raw.vcf
-  rm -f ${dir}/Scer-snps-tagged.vcf
+  rm -f ${dir}/${sample}-snps-raw.vcf
+  rm -f ${dir}/${sample}-snps-tagged.vcf
 fi
 
 # Convert VCF to BCF files and generate statistics.
 echo "Generate statistics."
-if [ ! -f ${dir}/Scer-snps-filtered.bcf ] || [ $clean -eq "0" ];
+if [ ! -f ${dir}/${sample}-snps-filtered.bcf ] || [ $clean -eq "0" ];
 then
   # Convert the VCF to a BCF file.
-  bcftools convert -Ou ${dir}/Scer-snps-filtered.vcf \
-    > ${dir}/Scer-snps-filtered.bcf
+  bcftools convert -Ou ${dir}/${sample}-snps-filtered.vcf \
+    > ${dir}/${sample}-snps-filtered.bcf
 	
   # Calculate statistics on the filtered variants.
-  bcftools stats ${dir}/Scer-snps-filtered.bcf \
-    > ${dir}/Scer-snps-filtered.stats
+  bcftools stats ${dir}/${sample}-snps-filtered.bcf \
+    > ${dir}/${sample}-snps-filtered.stats
 fi

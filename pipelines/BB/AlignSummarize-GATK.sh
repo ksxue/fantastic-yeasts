@@ -6,12 +6,14 @@
 # and generates a pileup and gVCF file.
 # Where possible or applicable, it follows the best practices described by GATK:
 # https://software.broadinstitute.org/gatk/best-practices/bp_3step.php?case=GermShortWGS
+# Note that this pipeline requires that the reference has already been indexed by
+# both bowtie, samtools, and GATK.
 
 # Load dependencies.
 module load modules modules-init modules-gs
 module load python/2.7.3
 module load cutadapt/1.8.3
-module laod bowtie2/2.2.3
+module load bowtie2/2.2.3
 module load samtools/1.3
 module load bcftools/1.3.1
 module load VCFtools/0.1.14
@@ -22,35 +24,21 @@ module load GATK/3.7
 module load picard/1.43
 
 # Input parameters.
-rawdir="$1"
-index1="$2"
-index2="$3"
-sample="$4"
-run="$5"
-dir="nobackup/BB"
-modules="pipelines/BB/LoadModules.sh"
-reference="reference/S288C/S288CReferenceAnnotated"
-clean=0 # If 0, reruns entire pipeline and regenerates all intermediates.
+fastq1="$1" # Give trimmed read 1 file.
+fastq2="$2" # Give trimmed read 2 file.
+sample="$3" # Give the sample name.
+dir="$4" # Give the desired location of intermediate output files.
+reference="$5" # Give reference path WITHOUT .fasta or .fa extension.
+refname="$6" # Give a short nickname for the reference sequence.
+clean="$7" # If 0, reruns entire pipeline and regenerates all intermediates.
 
-# Note that this pipeline requires that the reference has already been indexed by
-# both bowtie, samtools, and GATK.
+# Concatenate the sample and reference names
+# so that all files reflect both the strain and reference.
+sample="$sample-$refname"
 
 # Notifies user when all intermediate files are being regenerated.
-if $clean; then
+if [ ${clean} -eq "0" ]; then
   echo "Pipeline will run in its entirety, overwriting all existing intermediates."
-fi
-
-# Trim adapter sequences and bases below a quality threshold of 25.
-# Also remove all reads that are shorter than 20 bases after trimming.
-echo "Trim adapter sequences."
-if [ ! -f ${dir}/${sample}_trimmed-R1.fastq.gz ] || [ ! -f ${dir}/${sample}_trimmed-R2.fastq.gz ];
-then
-  cutadapt -a AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC -A AGATCGGAAGAGCGTCGTGTAGGGAAAG \
-    -q 25 -m 20 \
-	-o ${dir}/${sample}_trimmed-R1.fastq.gz -p ${dir}/${sample}_trimmed-R2.fastq.gz \
-	raw/${rawdir}/${index1}.${index2}_${run}.1.fastq.gz \
-	raw/${rawdir}/${index1}.${index2}_${run}.2.fastq.gz \
-	> ${dir}/${sample}.cutadapt.log
 fi
 
 # Align reads with bowtie2.
@@ -63,8 +51,8 @@ then
   bowtie2 --very-sensitive-local --un-conc-gz ${dir}/${sample}-unmapped \
 	-X 1000 \
 	-x ${reference} \
-	-1 ${dir}/${sample}_trimmed-R1.fastq.gz \
-	-2 ${dir}/${sample}_trimmed-R2.fastq.gz \
+	-1 ${fastq1} \
+	-2 ${fastq2} \
 	-S ${dir}/${sample}.sam \
 	2> ${dir}/${sample}.bt2.log
   samtools view -bS ${dir}/${sample}.sam -o ${dir}/${sample}-unsorted.bam
