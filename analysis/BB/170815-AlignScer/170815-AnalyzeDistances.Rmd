@@ -28,6 +28,41 @@ library(knitr)
 library(lubridate)
 ```
 
+
+```{r}
+# Read in metadata for FY strains.
+Metadata <- read.table("../../../data/BB/metadata-formatted.txt", header=TRUE,
+                       stringsAsFactors = FALSE, sep="\t")
+Metadata <- Metadata %>%
+  dplyr::select(ProjectName, Type, Genus, 
+                CaptureMethod, CaptureDescription, CaptureDate, City, State) %>%
+  mutate(Strain=ProjectName) %>% dplyr::select(-ProjectName)
+
+# Clean up date formatting.
+Metadata <- Metadata %>%
+  mutate(Date=mdy(CaptureDate), Year=year(Date)) %>% 
+  arrange(Date) %>% dplyr::select(-CaptureDate)
+
+# For this analysis, retain only information for S. cerevisiae strains.
+# Metadata <- Metadata %>% filter(ProjectName %in% PairwiseDistances$Strain1) %>%
+#  mutate(Strain=ProjectName) %>% dplyr::select(-ProjectName)
+
+# Create a unique name for each strain with annotation information
+# about time and location of collection.
+Metadata <- Metadata %>% mutate(StrainLong=paste(Strain,State,Year,sep="-"))
+
+# Write a function to generate the strain name with annotations,
+# given the shorter strain name.
+# Note that not all strains have the same types of annotations.
+StrainToStrainLong <- function(strain){
+  strainlong <- strain
+  if(strain %in% Metadata$Strain){
+    strainlong <- Metadata$StrainLong[match(strain, Metadata$Strain)]
+  }
+  return(strainlong)
+}
+```
+
 ```{r}
 # Read in the VCF. Make sure the reference genome has been installed.
 vcf <- readVcf("../../../nobackup/BB/170815-AlignScer/Scer-snps-filtered.vcf", "sacCer3")
@@ -138,6 +173,10 @@ PairwiseDistances <- PairwiseDistances %>%
   separate(Strain2, into=c("Strain2","Ref2"), sep="-") %>%
   dplyr::select(-Ref1, -Ref2)
 
+# Add strain metadata.
+PairwiseDistances$Strain1 <- sapply(PairwiseDistances$Strain1, StrainToStrainLong)
+PairwiseDistances$Strain2 <- sapply(PairwiseDistances$Strain2, StrainToStrainLong)
+
 # Calculate genome-wide divergence, averaged between diploid genomes. 
 PairwiseDistances <- PairwiseDistances %>%
   mutate(Divergence=Distance/(2*12e6)) %>%
@@ -219,23 +258,5 @@ SortedHeatmap
 p <- plot_grid(Dendrogram, SortedHeatmap, ncol=1,
               rel_heights=c(2,3.5))
 p
-```
-
-```{r}
-# Read in metadata for FY strains.
-Metadata <- read.table("../../../data/BB/metadata-formatted.txt", header=TRUE,
-                       stringsAsFactors = FALSE, sep="\t")
-Metadata <- Metadata %>%
-  dplyr::select(ProjectName, Type, Genus, 
-                CaptureMethod, CaptureDescription, CaptureDate, City, State)
-
-# Clean up date formatting.
-Metadata <- Metadata %>%
-  mutate(Date=mdy(CaptureDate), Year=year(Date)) %>% 
-  arrange(Date) %>% dplyr::select(-CaptureDate)
-
-# For this analysis, retain only information for S. cerevisiae strains.
-Metadata <- Metadata %>% filter(ProjectName %in% PairwiseDistances$Strain1) %>%
-  mutate(Strain=ProjectName) %>% dplyr::select(-ProjectName)
 ```
 

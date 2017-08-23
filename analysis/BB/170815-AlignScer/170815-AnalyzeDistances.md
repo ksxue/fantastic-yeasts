@@ -2,6 +2,40 @@ Perform basic operations with VCF files.
 ================
 
 ``` r
+# Read in metadata for FY strains.
+Metadata <- read.table("../../../data/BB/metadata-formatted.txt", header=TRUE,
+                       stringsAsFactors = FALSE, sep="\t")
+Metadata <- Metadata %>%
+  dplyr::select(ProjectName, Type, Genus, 
+                CaptureMethod, CaptureDescription, CaptureDate, City, State) %>%
+  mutate(Strain=ProjectName) %>% dplyr::select(-ProjectName)
+
+# Clean up date formatting.
+Metadata <- Metadata %>%
+  mutate(Date=mdy(CaptureDate), Year=year(Date)) %>% 
+  arrange(Date) %>% dplyr::select(-CaptureDate)
+
+# For this analysis, retain only information for S. cerevisiae strains.
+# Metadata <- Metadata %>% filter(ProjectName %in% PairwiseDistances$Strain1) %>%
+#  mutate(Strain=ProjectName) %>% dplyr::select(-ProjectName)
+
+# Create a unique name for each strain with annotation information
+# about time and location of collection.
+Metadata <- Metadata %>% mutate(StrainLong=paste(Strain,State,Year,sep="-"))
+
+# Write a function to generate the strain name with annotations,
+# given the shorter strain name.
+# Note that not all strains have the same types of annotations.
+StrainToStrainLong <- function(strain){
+  strainlong <- strain
+  if(strain %in% Metadata$Strain){
+    strainlong <- Metadata$StrainLong[match(strain, Metadata$Strain)]
+  }
+  return(strainlong)
+}
+```
+
+``` r
 # Read in the VCF. Make sure the reference genome has been installed.
 vcf <- readVcf("../../../nobackup/BB/170815-AlignScer/Scer-snps-filtered.vcf", "sacCer3")
 
@@ -53,7 +87,7 @@ ggplot(AlleleFreq) +
   xlab("Frequency") + ylab("Number of SNPs")
 ```
 
-![](170815-AnalyzeDistances_files/figure-markdown_github-ascii_identifiers/unnamed-chunk-2-1.png)
+![](170815-AnalyzeDistances_files/figure-markdown_github-ascii_identifiers/unnamed-chunk-3-1.png)
 
 ``` r
 # Calculate the distance of each variant from the reference sequence.
@@ -72,7 +106,7 @@ ggplot(StrainDistance) +
   xlab("Sample") + ylab("Divergence")
 ```
 
-![](170815-AnalyzeDistances_files/figure-markdown_github-ascii_identifiers/unnamed-chunk-2-2.png)
+![](170815-AnalyzeDistances_files/figure-markdown_github-ascii_identifiers/unnamed-chunk-3-2.png)
 
 ``` r
 # Convert genotype matrix to dataframe.
@@ -115,6 +149,10 @@ PairwiseDistances <- PairwiseDistances %>%
   separate(Strain2, into=c("Strain2","Ref2"), sep="-") %>%
   dplyr::select(-Ref1, -Ref2)
 
+# Add strain metadata.
+PairwiseDistances$Strain1 <- sapply(PairwiseDistances$Strain1, StrainToStrainLong)
+PairwiseDistances$Strain2 <- sapply(PairwiseDistances$Strain2, StrainToStrainLong)
+
 # Calculate genome-wide divergence, averaged between diploid genomes. 
 PairwiseDistances <- PairwiseDistances %>%
   mutate(Divergence=Distance/(2*12e6)) %>%
@@ -128,7 +166,7 @@ ggplot(PairwiseDistances %>%
   xlab("Pairwise divergence") + ylab("Number of pairs")
 ```
 
-![](170815-AnalyzeDistances_files/figure-markdown_github-ascii_identifiers/unnamed-chunk-3-1.png)
+![](170815-AnalyzeDistances_files/figure-markdown_github-ascii_identifiers/unnamed-chunk-4-1.png)
 
 ``` r
 # Plot the distance of each strain from every other strain.
@@ -146,7 +184,7 @@ ggplot(PairwiseDistances %>%
   theme(axis.text.x=element_text(angle=90, vjust=0.5))
 ```
 
-![](170815-AnalyzeDistances_files/figure-markdown_github-ascii_identifiers/unnamed-chunk-3-2.png)
+![](170815-AnalyzeDistances_files/figure-markdown_github-ascii_identifiers/unnamed-chunk-4-2.png)
 
 ``` r
 # Plot a heatmap of the pairwise distances.
@@ -160,7 +198,7 @@ ggplot(PairwiseDistances) +
         axis.line = element_blank())
 ```
 
-![](170815-AnalyzeDistances_files/figure-markdown_github-ascii_identifiers/unnamed-chunk-3-3.png)
+![](170815-AnalyzeDistances_files/figure-markdown_github-ascii_identifiers/unnamed-chunk-4-3.png)
 
 ``` r
 # List top ten most closely related pairs of strains.
@@ -169,28 +207,28 @@ kable(head(PairwiseDistances %>%
                 arrange(Distance), 20))
 ```
 
-| Strain1 | Strain2 |  Distance|  Divergence|
-|:--------|:--------|---------:|-----------:|
-| FY0004  | FY0026  |         0|   0.0000000|
-| FY0003  | FY0008  |       483|   0.0000201|
-| FY0003  | FY0009  |       521|   0.0000217|
-| FY0014  | FY0019  |       545|   0.0000227|
-| FY0019  | FY0021  |       546|   0.0000228|
-| FY0008  | FY0009  |       569|   0.0000237|
-| FY0019  | FY0024  |       661|   0.0000275|
-| FY0021  | FY0024  |       662|   0.0000276|
-| FY0014  | FY0021  |       668|   0.0000278|
-| YMD1871 | YMD1952 |       784|   0.0000327|
-| FY0014  | FY0024  |       808|   0.0000337|
-| FY0015  | FY0020  |      1028|   0.0000428|
-| FY0024  | FY0028  |      1689|   0.0000704|
-| FY0019  | FY0028  |      1870|   0.0000779|
-| FY0021  | FY0028  |      1929|   0.0000804|
-| FY0014  | FY0028  |      2048|   0.0000853|
-| FY0022  | FY0027  |      3078|   0.0001282|
-| YMD1866 | YMD1870 |      8983|   0.0003743|
-| YMD1865 | YMD1866 |     12505|   0.0005210|
-| YMD1865 | YMD1870 |     12671|   0.0005280|
+| Strain1        | Strain2        |  Distance|  Divergence|
+|:---------------|:---------------|---------:|-----------:|
+| FY0004-NC-2013 | FY0026-MO-2015 |         0|   0.0000000|
+| FY0003-NC-2013 | FY0008-CO-2013 |       483|   0.0000201|
+| FY0003-NC-2013 | FY0009-CO-2013 |       521|   0.0000217|
+| FY0014-TN-2015 | FY0019-TN-2015 |       545|   0.0000227|
+| FY0019-TN-2015 | FY0021-MI-2015 |       546|   0.0000228|
+| FY0008-CO-2013 | FY0009-CO-2013 |       569|   0.0000237|
+| FY0019-TN-2015 | FY0024-MO-2015 |       661|   0.0000275|
+| FY0021-MI-2015 | FY0024-MO-2015 |       662|   0.0000276|
+| FY0014-TN-2015 | FY0021-MI-2015 |       668|   0.0000278|
+| YMD1871        | YMD1952        |       784|   0.0000327|
+| FY0014-TN-2015 | FY0024-MO-2015 |       808|   0.0000337|
+| FY0015-WA-2015 | FY0020-WA-2014 |      1028|   0.0000428|
+| FY0024-MO-2015 | FY0028-MO-2015 |      1689|   0.0000704|
+| FY0019-TN-2015 | FY0028-MO-2015 |      1870|   0.0000779|
+| FY0021-MI-2015 | FY0028-MO-2015 |      1929|   0.0000804|
+| FY0014-TN-2015 | FY0028-MO-2015 |      2048|   0.0000853|
+| FY0022-NA-NA   | FY0027-WI-2015 |      3078|   0.0001282|
+| YMD1866        | YMD1870        |      8983|   0.0003743|
+| YMD1865        | YMD1866        |     12505|   0.0005210|
+| YMD1865        | YMD1870        |     12671|   0.0005280|
 
 ``` r
 # Convert the pairwise distance dataframe into a matrix.
@@ -225,7 +263,7 @@ SortedHeatmap <-
 SortedHeatmap
 ```
 
-![](170815-AnalyzeDistances_files/figure-markdown_github-ascii_identifiers/unnamed-chunk-4-1.png)
+![](170815-AnalyzeDistances_files/figure-markdown_github-ascii_identifiers/unnamed-chunk-5-1.png)
 
 ``` r
 # Combine dendrogram and heatmap.
@@ -234,22 +272,4 @@ p <- plot_grid(Dendrogram, SortedHeatmap, ncol=1,
 p
 ```
 
-![](170815-AnalyzeDistances_files/figure-markdown_github-ascii_identifiers/unnamed-chunk-5-1.png)
-
-``` r
-# Read in metadata for FY strains.
-Metadata <- read.table("../../../data/BB/metadata-formatted.txt", header=TRUE,
-                       stringsAsFactors = FALSE, sep="\t")
-Metadata <- Metadata %>%
-  dplyr::select(ProjectName, Type, Genus, 
-                CaptureMethod, CaptureDescription, CaptureDate, City, State)
-
-# Clean up date formatting.
-Metadata <- Metadata %>%
-  mutate(Date=mdy(CaptureDate), Year=year(Date)) %>% 
-  arrange(Date) %>% dplyr::select(-CaptureDate)
-
-# For this analysis, retain only information for S. cerevisiae strains.
-Metadata <- Metadata %>% filter(ProjectName %in% PairwiseDistances$Strain1) %>%
-  mutate(Strain=ProjectName) %>% dplyr::select(-ProjectName)
-```
+![](170815-AnalyzeDistances_files/figure-markdown_github-ascii_identifiers/unnamed-chunk-6-1.png)
