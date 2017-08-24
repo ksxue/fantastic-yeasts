@@ -31,7 +31,7 @@ library(lubridate)
 
 ```{r}
 # Read in metadata for FY strains.
-Metadata <- read.table("../../../data/BB/metadata-formatted.txt", header=TRUE,
+Metadata <- read.table("../../../data/BB/metadata-BB-formatted.txt", header=TRUE,
                        stringsAsFactors = FALSE, sep="\t")
 Metadata <- Metadata %>%
   dplyr::select(ProjectName, Type, Genus, 
