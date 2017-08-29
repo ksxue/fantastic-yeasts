@@ -1,0 +1,29 @@
+Directory	ProjectName	MDID	MDName	CultureID	Type	Genus	CaptureMethod	CaptureDescription	CaptureDate	City	State	SentDate	Index1	Index2	Index1Seq	Index2Seq
+Akey_Madeoy_yeast2_160830_done	FY0001	3038	BB0039	BB0039	Isolate	Yeast	Other	"Petrified wood in wort"	8/14/2014	?	MT	12/4/2015	N703	S517	TTCTGCCT	TCTTACGC
+Akey_Madeoy_yeast2_160830_done	FY0002	3039	BB22204	BB22204	Isolate	Yeast	OpenAir	"DIY Coolship"	2/1/2013	Arlington	VA	12/4/2015	N703	S502	TTCTGCCT	ATAGAGAG
+Akey_Madeoy_yeast2_160830_done	FY0003	3040	BB28746A	BB28746A	Isolate	Yeast	Fruit	"Wild blackberries in wort"	7/13/2013	"Lake Lure"	NC	12/4/2015	N704	S517	GCTCAGGA	TCTTACGC
+Akey_Madeoy_yeast2_160830_done	FY0004	3041	BB28746B	BB28746B	Isolate	Yeast	Fruit	"Wild blackberries in wort"	7/13/2013	"Lake Lure"	NC	12/4/2015	N703	S503	TTCTGCCT	AGAGGATA
+Akey_Madeoy_yeast2_160830_done	FY0005	3042	BB37066B	BB37066B	Isolate	Yeast	Other	"Briar/Thorn placed in wort"	7/19/2014	Cottontown	TN	12/4/2015	N703	S504	TTCTGCCT	TCTACTCT
+Akey_Madeoy_yeast2_160830_done	FY0006	3043	BB37212	BB37212	Isolate	Yeast	Fruit	"Elderberry Fruit in wort"	10/1/2013	Nashville	TN	12/4/2015	N701	S503	TCGCCTTA	AGAGGATA
+Akey_Madeoy_yeast2_160830_done	FY0007	3044	BB41944	BB41944	Isolate	Yeast	Fruit	"Figs placed in wort"	11/1/2014	Mobile	AL	12/4/2015	N701	S504	TCGCCTTA	TCTACTCT
+Akey_Madeoy_yeast2_160830_done	FY0008	3045	BB80907A	BB80907A	Isolate	Yeast	Fruit	"Multiple types of  berries in wort"	7/1/2013	"Colorado Springs"	CO	12/4/2015	N705	S517	AGGAGTCC	TCTTACGC
+Akey_Madeoy_yeast2_160830_done	FY0009	3046	BB80907B	BB80907B	Isolate	Yeast	Fruit	"Multiple types of  berries in wort"	7/1/2013	"Colorado Springs"	CO	12/4/2015	N705	S502	AGGAGTCC	ATAGAGAG
+Akey_Madeoy_yeast2_160830_done	FY0010	3047	BB80907C*	BB80907C	Blend	Yeast	Other	"Honey dilluted in wort"	7/7/2012	"Colorado Springs"	CO	12/4/2015	N705	S503	AGGAGTCC	AGAGGATA
+Akey_Madeoy_yeast2_160830_done	FY0011	3048	BB99301A	BB99301A	Isolate	Yeast	Fruit	"Chardonnay Grapes in wort"	9/1/2014	Pasco	WA	12/4/2015	N705	S504	AGGAGTCC	TCTACTCT
+Akey_Madeoy_yeast2_160830_done	FY0012	3180	"BB 37135B 17 4.6"	BB37135B	Isolate	Yeast	Flora	"Small white flower whisps in wort"	10/1/2015	Nolensville	TN	4/11/2016	N704	S503	GCTCAGGA	AGAGGATA
+Akey_Madeoy_yeast2_160830_done	FY0013	3181	"17201A 3 4.6" 	BB17201A	Isolate	Yeast	OpenAir	"DIY Coolship (open inoculation in wort)"	2/1/2015	Chambersburg	PA	4/11/2016	N704	S504	GCTCAGGA	TCTACTCT
+Akey_Madeoy_yeast2_160830_done	FY0014	3182	"BB 37211B 11 4.6"	BB37211B	Isolate	Yeast	Fruit	"Small, ripe red fruit from bush in wort"	10/1/2015	Nashville	TN	4/11/2016	N702	S503	CTAGTACG	AGAGGATA
+Akey_Madeoy_yeast2_160830_done	FY0015	3183	"BB 98422A 14 4.6"	BB98422A	Isolate	Yeast	Multiple	"Large yellow bumble bee,  spider, and oregano flowers in wort"	6/1/2015	Tacoma	WA	4/11/2016	N701	S517	TCGCCTTA	TCTTACGC
+Akey_Madeoy_yeast2_160830_done	FY0016	3184	"BB TH01 12 4.6"	NA	NA	NA	NA	NA	NA	NA	NA	NA	N701	S502	TCGCCTTA	ATAGAGAG
+Akey_Madeoy_yeast1_160830_done	FY0017	3185	"BB 04092 15 4.6"	BB04092	Isolate	Yeast	Fruit	"Wild Berries"	9/1/2015	Westbrook	ME	4/11/2016	N701	S503	TCGCCTTA	AGAGGATA
+Akey_Madeoy_yeast2_160830_done	FY0018	3186	"BB 38111 16 4.6"	BB38111	Isolate	Yeast	Flora	"Dandellion in wort"	5/1/2013	Memphis	TN	4/11/2016	N702	S504	CTAGTACG	TCTACTCT
+Akey_Madeoy_yeast2_160830_done	FY0019	3187	"BB 37211A 10 4.6"	BB37211A	Isolate	Yeast	Fruit	"Small, ripe red fruit from bush in wort"	10/1/2015	Nashville	TN	4/11/2016	N706	S517	CATGCCTA	TCTTACGC
+Akey_Madeoy_yeast1_160830_done	FY0020	3188	"BB 98422B 13 4.6"	BB98422B	Isolate	Yeast	OpenAir	"DIY Coolship"	3/1/2014	Tacoma	WA	4/11/2016	N701	S504	TCGCCTTA	TCTACTCT
+Akey_Madeoy_yeast2_160830_done	FY0021	3189	"BB 49829 1 4.6"	BB49829	Isolate	Yeast	Fruit	"Raspberries in wort"	9/1/2015	Escanaba	MI	4/11/2016	N702	S517	CTAGTACG	TCTTACGC
+Akey_Madeoy_yeast2_160830_done	FY0022	3190	"47006 5 4.6"	NA	NA	NA	NA	NA	NA	NA	NA	NA	N702	S502	CTAGTACG	ATAGAGAG
+Akey_Madeoy_yeast2_160830_done	FY0023	3191	"BB 53090B 7 4.6" 	BB53090B	Isolate	Yeast	OpenAir	"DIY Corn Field Coolship (open inoculation in wort)"	1/1/2015	West Bend	WI	4/11/2016	N706	S502	CATGCCTA	ATAGAGAG
+Akey_Madeoy_yeast2_160830_done	FY0024	3192	"BB 63701C 2 4.6"	BB63701C	Isolate	Yeast	OpenAir	"DIY Coolship (open inoculation in wort)"	4/23/2015	"Cape Girardeau"	MO	4/11/2016	N706	S503	CATGCCTA	AGAGGATA
+Akey_Madeoy_yeast2_160830_done	FY0025	3193	"17201B 4 4.6"	BB17201B	Isolate	Yeast	OpenAir	"DIY Coolship (open inoculation in wort)"	2/1/2015	Chambersburg	PA	4/11/2016	N706	S504	CATGCCTA	TCTACTCT
+Akey_Madeoy_yeast2_160830_done	FY0026	3194	"BB 21755 9 4.6"	BB21755	Isolate	Yeast	Fruit	"Orchard apple skins placed in cider"	11/1/2015	Jefferson	MO	4/11/2016	N703	S503	TTCTGCCT	AGAGGATA
+Akey_Madeoy_yeast1_160830_done	FY0027	3195	"BB 53090A 6 4.6"	BB53090A	Isolate	Yeast	OpenAir	"DIY Corn Field Coolship (open inoculation in wort)"	1/1/2015	"West Bend"	WI	4/11/2016	N702	S503	CTAGTACG	AGAGGATA
+Akey_Madeoy_yeast1_160830_done	FY0028	3196	"BB 63701A 8 4.6"	BB63701A	Isolate	Yeast	OpenAir	"DIY Coolship (open inoculation in wort)"	4/23/2015	"Cape Girardeau"	MO	4/11/2016	N702	S504	CTAGTACG	TCTACTCT
