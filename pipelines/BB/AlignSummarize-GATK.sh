@@ -12,12 +12,12 @@
 # Load dependencies.
 module load modules modules-init modules-gs
 module load python/2.7.3
+module load zlib/1.2.6
 module load cutadapt/1.8.3
 module load bowtie2/2.2.3
 module load samtools/1.3
 module load bcftools/1.3.1
 module load VCFtools/0.1.14
-module load zlib/1.2.6
 module load bwa/0.7.13
 module load java/8u25
 module load GATK/3.7
