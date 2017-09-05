@@ -15,4 +15,4 @@ FASTQ="nobackup/BB/FY0002-unmapped.1"
 sample=${FASTQ##*/}
 sample=${sample%%.*}
 qsub -cwd -N ${sample} -o nobackup/BB/sge/${sample}.o -e nobackup/BB/sge/${sample}.e \
-${runBLAST} ${FASTQ} ${genomes} 1000
+  ${runBLAST} ${FASTQ} ${genomes} 1000 FY0002-unmapped nobackup/BB/170810-FY0002
