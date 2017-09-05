@@ -46,6 +46,6 @@ END
 
 # Submit batch jobs to align reads to the S288C reference.
 qsub -cwd -N AlignS288C -l m_mem_free=12G \
-  -t 1-${numsamples} -tc 50 \
+  -t 1-${numsamples} -tc 75 \
   -o nobackup/${project}/sge/ -e nobackup/${project}/sge/ \
   ${batchalignsummarize} ${samplesheet} ${outdir} ${reference} S288C ${clean}

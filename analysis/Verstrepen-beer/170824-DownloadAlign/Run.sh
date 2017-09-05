@@ -20,6 +20,7 @@ trimdir="nobackup/Verstrepen-beer/trimmed"
 outdir="nobackup/Verstrepen-beer/170824-DownloadAlign"
 # other
 project="Verstrepen-beer"
+reference="reference/S288C/S288CReferenceAnnotated"
 clean=1
 
 # Calculate the number of samples to be analyzed.
@@ -93,6 +94,17 @@ do
   fi
 done < ${outdir}/singlets.txt
 
+# The reads corresponding to sample WL005, SRR5688269 have some problem as uploaded.
+# Specifically, fastq-dump rejects all read 2 files as technical duplicates.
+# I have not yet looked carefully into this problem to debug it.
+# For the time being, the other corresponding file, SRR5688268, is renamed
+# as the ONLY FASTQ file corresponding to this sample.
+if [ -f ${dir}/SRR5688268_1.fastq.gz ] && [ -f ${dir}/SRR5688268_2.fastq.gz ];
+then
+  mv -f ${dir}/SRR5688268_1.fastq.gz ${dir}/WL005_1.fastq.gz
+  mv -f ${dir}/SRR5688268_2.fastq.gz ${dir}/WL005_2.fastq.gz
+fi
+
 # Generate the samplesheet with paths to the raw and trimmed reads
 # for each sample.
 while read sample
@@ -100,6 +112,9 @@ do
   echo "${dir}/${sample}_1.fastq.gz ${dir}/${sample}_2.fastq.gz ${trimdir}/${sample}_trimmed-R1.fastq.gz ${trimdir}/${sample}_trimmed-R2.fastq.gz ${sample}"
 done < <( cut -f12 ${samplesheetraw} | tail -n +2 | sort | uniq | sort ) \
   > ${samplesheet}
+  
+# Remove all remaining SRR files.
+rm -f ${dir}/SRR*
   
 #############################
 # Trim reads for all samples.
@@ -114,3 +129,9 @@ numsamples="$(wc -l ${samplesheet} | cut -f1 -d' ')"
 qsub -cwd -N TrimAdapters -t 1-${numsamples} -tc 50 \
   -o nobackup/${project}/sge/ -e nobackup/${project}/sge/ \
   ${batchtrimadapters} ${samplesheet} ${trimdir} ${clean}
+  
+# Submit batch jobs to align reads to the S288C reference.
+qsub -cwd -N AlignS288C -l m_mem_free=12G \
+  -t 1-${numsamples} -tc 100 -hold_jid TrimAdapters \
+  -o nobackup/${project}/sge/ -e nobackup/${project}/sge/ \
+  ${batchalignsummarize} ${samplesheet} ${outdir} ${reference} S288C ${clean}
