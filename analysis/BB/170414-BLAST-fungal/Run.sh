@@ -15,17 +15,16 @@ runBLAST="analysis/BB/170414-BLAST-fungal/RunBLAST.sh"
 genomes="analysis/BB/170414-BLAST-fungal/dirs_asco.txt"
 outdir="nobackup/BB/170414-BLAST-fungal"
 numreads=1000
-samplesheet="data/BB/Samples.data"
+samplesheet="data/BB/Samples-BB.data"
 
 # Submit jobs to BLAST 10000 reads from each sample 
 # against Jim Thomas's Ascomycetes genomes.
-:<<END
 while read fastq1 fastq2 trimmed1 trimmed2 sample
 do
-  qsub -cwd -N ${sample} -o nobackup/BB/sge/${sample}.o -e nobackup/BB/sge/${sample}.e \
+  qsub -cwd -l h_rt=48:00:00 \
+    -N ${sample} -o nobackup/BB/sge/${sample}.o -e nobackup/BB/sge/${sample}.e \
     ${runBLAST} ${fastq1} ${genomes} ${numreads} ${sample} ${outdir}
 done < ${samplesheet}
-END
 
 # Extract the top-matching genome for each sample.
 rm -f ${dir}/FungalBLAST.data
@@ -39,7 +38,7 @@ done
 
 # Associate the top-matching genomes for each strain
 # with the strain metadata.
-paste -d'\t' ${dir}/FungalBLAST.data <(tail -n +2 data/BB/metadata-raw.tsv ) \
+paste -d'\t' ${dir}/FungalBLAST.data <(tail -n +2 data/BB/metadata-BB-raw.tsv ) \
   | cut -f1,2,7 > ${dir}/StrainSummary.data
   
 # Create a list of all strains whose primary match is S. cerevisiae.
