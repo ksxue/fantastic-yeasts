@@ -17,7 +17,7 @@ dir="nobackup/McCusker-100g/raw"
 trimdir="nobackup/McCusker-100g/trimmed"
 outdir="nobackup/McCusker-100g/170824-DownloadAlign"
 project="McCusker-100g"
-clean=0
+clean=1
 
 # Download raw FASTQ reads associated with each strain in the dataset.
 :<<END
@@ -45,7 +45,7 @@ qsub -cwd -N TrimAdapters -t 1-${numsamples} -tc 50 \
 END
 
 # Submit batch jobs to align reads to the S288C reference.
-qsub -cwd -N AlignS288C -l m_mem_free=12G \
+qsub -cwd -N AlignS288C -l h_rt=48:00:00 -l m_mem_free=12G \
   -t 1-${numsamples} -tc 75 \
   -o nobackup/${project}/sge/ -e nobackup/${project}/sge/ \
   ${batchalignsummarize} ${samplesheet} ${outdir} ${reference} S288C ${clean}
