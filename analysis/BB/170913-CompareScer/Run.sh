@@ -48,11 +48,12 @@ done < ${dir}/Samples.list >> ${dir}/Samples-found.list
 ${CallFilterVariants} ${dir}/Samples-found.list ${reference} ${dir} S288C ${clean}
 
 # Convert VCF file to genotype table.
-if [ ! -f ${dir}/S288C-genotypes.data ] || [ $clean -eq "0" ]; then
+if [ ! -f ${dir}/S288C-genotypes.data.gz ] || [ $clean -eq "0" ]; then
   java -jar ${GATK_DIR}/GenomeAnalysisTK.jar \
     -R ${reference}.fasta \
     -T VariantsToTable \
     -V ${dir}/S288C-snps-filtered.vcf \
     -F CHROM -F POS -GF GT \
     -o ${dir}/S288C-genotypes.data
+  gzip ${dir}/S288C-genotypes.data
 fi
