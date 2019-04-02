@@ -6,7 +6,7 @@
 # Load dependencies.
 module load modules modules-init modules-gs
 module load python/2.7.3
-# module load cutadapt/1.8.3
+module load cutadapt/1.8.3
 
 # Input parameters.
 fastq1="$1"
